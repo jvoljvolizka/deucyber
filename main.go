@@ -1,9 +1,11 @@
 package main
 
 import (
+	"deucyber"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -35,9 +37,13 @@ type config struct {
 	Botkey   string `json:"Botkey"`
 	MasterID string `json:"MasterID"`
 	DBtype   string `json:"DBtype"`
+	DBname   string `json:"DBname"`
+	//	Collection string `json:"Collection"`
+	Connection string `json:"Connection"`
 }
 
 var News []*newsItem
+var Config config
 
 func parseNews(input string) (string, error) {
 
@@ -65,7 +71,7 @@ func reterr(err error) error {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<h1> Peace never was an option </h1>")
+	fmt.Fprintf(w, "<h1> yo ! wanna do some aws ?  </h1>")
 }
 
 var newsList []string
@@ -90,9 +96,11 @@ func bot() {
 
 	}()
 
-	key := os.Getenv("BOTTOKEN")
+	//key := os.Getenv("BOTTOKEN")
+	key := Config.Botkey
+
 	if key == "" {
-		panic("Token variable is empty -.-")
+		panic("Token variable is empty -.- check config file")
 	}
 	bot, err := tg.NewBotAPI(key)
 
@@ -166,13 +174,48 @@ func bot() {
 
 func main() {
 
+	file := os.Args[1]
+
+	conFile, err := os.Open(file)
+
+	if err != nil {
+		fmt.Println("file open error")
+		log.Panic(err)
+	}
+
+	conData, err := ioutil.ReadAll(conFile)
+
+	if err != nil {
+		fmt.Println("file read error")
+		log.Panic(err)
+	}
+
+	err = json.Unmarshal(conData, &Config)
+
+	if err != nil {
+		fmt.Println("json parsing error")
+		log.Panic(err)
+	}
+
+	///clean this shit please
+	var dbconf deucyber.Config
+	dbconf.DBname = Config.DBname
+	dbconf.DBtype = Config.DBtype
+	dbconf.Connection = Config.Connection
+
+	deucyber.GetConf(dbconf)
+
+	fmt.Println(Config.Botkey)
+	fmt.Println(Config.DBtype)
+	fmt.Println(Config.MasterID)
+
 	go bot()
 
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", index)
 	router.HandleFunc("/news", news)
 
-	err := http.ListenAndServe(":3300", handlers.LoggingHandler(os.Stdout, router))
+	err = http.ListenAndServe(":3300", handlers.LoggingHandler(os.Stdout, router))
 
 	if err != nil {
 		reterr(err)

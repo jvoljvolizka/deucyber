@@ -1,0 +1,7 @@
+{
+    "Botkey" : "TELEGRAM-BOT-KEY",
+    "MasterID" : "ADMIN-USER-ID",
+    "DBtype" : "DATABASE-TYPE-(mongodb/dynamodb <- not implemented)",
+    "DBname" : "DATABASE-NAME",
+    "Connection" : "(connection info)"
+}
