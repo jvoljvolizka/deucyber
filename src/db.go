@@ -10,20 +10,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type Config struct {
-	DBtype     string `json:"DBtype"`
-	DBname     string `json:"DBname"`
-	Connection string `json:"Connection"`
-}
-
-type newsItem struct {
-	Title string `json:"Title"`
-	Desc  string `json:"Desc"`
-	Link  string `json:"Link"`
-	//	Desc string `json:"Desc"`
-
-}
-
 var DBconfig Config
 var c *mongo.Client
 
@@ -54,7 +40,7 @@ func GetClient(server string) *mongo.Client {
 	return client
 }
 
-func InsertNews(item newsItem) interface{} {
+func InsertNews(item NewsItem) interface{} {
 	collection := c.Database(DBconfig.DBname).Collection("News")
 	insertResult, err := collection.InsertOne(context.TODO(), item)
 	if err != nil {
@@ -63,24 +49,24 @@ func InsertNews(item newsItem) interface{} {
 	return insertResult.InsertedID
 }
 
-func GetOneNews(filter bson.M) newsItem {
-	var item newsItem
+func GetOneNews(filter bson.M) NewsItem {
+	var item NewsItem
 	collection := c.Database(DBconfig.DBname).Collection("News")
 	documentReturned := collection.FindOne(context.TODO(), filter)
 	documentReturned.Decode(&item)
 	return item
 }
 
-func GetNews() []*newsItem {
+func GetNews() []*NewsItem {
 	filter := bson.M{}
-	var newsList []*newsItem
+	var newsList []*NewsItem
 	collection := c.Database(DBconfig.DBname).Collection("News")
 	cur, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		log.Fatal("Error on Finding all the documents", err)
 	}
 	for cur.Next(context.TODO()) {
-		var item newsItem
+		var item NewsItem
 		err = cur.Decode(&item)
 		if err != nil {
 			log.Fatal("Error on Decoding the document", err)
