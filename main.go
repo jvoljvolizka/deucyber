@@ -28,14 +28,20 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func news(w http.ResponseWriter, r *http.Request) {
-	var News []*deucyber.NewsItem
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	News = deucyber.GetNews()
-	err := json.NewEncoder(w).Encode(News)
 
-	if err != nil {
-		reterr(err)
+	if deucyber.DBstatus {
+		var News []*deucyber.NewsItem
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		News = deucyber.GetNews()
+		err := json.NewEncoder(w).Encode(News)
+		if err != nil {
+			reterr(err)
+		}
+
+	} else {
+		fmt.Fprintf(w, "<h1> Database error -.-  </h1>")
 	}
+
 }
 
 func main() {
@@ -71,6 +77,7 @@ func main() {
 	fmt.Println(Config.DBtype)
 	fmt.Println(Config.MasterID)
 
+	go deucyber.DBcheck()
 	go deucyber.Bot(Config)
 
 	router := mux.NewRouter().StrictSlash(true)

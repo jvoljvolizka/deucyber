@@ -6,35 +6,10 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	tg "github.com/go-telegram-bot-api/telegram-bot-api"
 )
-
-/*
-
-   title:
-   description :
-   link :
-   date:
-
-*/
-
-type NewsItem struct {
-	Title string `json:"Title"`
-	Desc  string `json:"Desc"`
-	Link  string `json:"Link"`
-	//	Desc string `json:"Desc"`
-
-}
-
-type Config struct {
-	Botkey   string `json:"Botkey"`
-	MasterID string `json:"MasterID"`
-	DBtype   string `json:"DBtype"`
-	DBname   string `json:"DBname"`
-	//	Collection string `json:"Collection"`
-	Connection string `json:"Connection"`
-}
 
 var News []*NewsItem
 
@@ -56,8 +31,13 @@ func ParseNews(input string) (string, error) {
 	item.Title = parsed[0]
 	item.Desc = parsed[1]
 	item.Link = parsed[2]
+	item.Time = time.Now().UnixNano()
 
-	InsertNews(item)
+	if DBstatus {
+		InsertNews(item)
+	} else {
+		return "", errors.New("Database connection is busted -.- ")
+	}
 
 	out := "Title = " + parsed[0] + "Desc = " + parsed[1] + "Link = " + parsed[2]
 	return out, nil
@@ -131,13 +111,19 @@ func Bot(Con Config) {
 			suid := fmt.Sprintf("%v", uid)
 			msg.Text = suid + " this library is stupid "
 		case "fuckmeup":
-			News = GetNews()
-			jsondata, err := json.Marshal(News)
-			if err != nil {
-				msg.Text = err.Error()
+			if DBstatus {
+				News = GetNews()
+
+				jsondata, err := json.Marshal(News)
+				if err != nil {
+					msg.Text = err.Error()
+				} else {
+					msg.Text = string(jsondata)
+				}
 			} else {
-				msg.Text = string(jsondata)
+				msg.Text = "Database connection is busted -.-"
 			}
+
 		default:
 			msg.Text = "wat ?"
 		}
