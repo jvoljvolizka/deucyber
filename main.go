@@ -44,6 +44,23 @@ func news(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func events(w http.ResponseWriter, r *http.Request) {
+
+	if deucyber.DBstatus {
+		var Events []*deucyber.EventItem
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		Events = deucyber.GetEvents()
+		err := json.NewEncoder(w).Encode(Events)
+		if err != nil {
+			reterr(err)
+		}
+
+	} else {
+		fmt.Fprintf(w, "<h1> Database error -.-  </h1>")
+	}
+
+}
+
 func main() {
 
 	file := os.Args[1]
@@ -83,6 +100,7 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", index)
 	router.HandleFunc("/news", news)
+	router.HandleFunc("/events", events)
 
 	err = http.ListenAndServe(":3300", handlers.LoggingHandler(os.Stdout, router))
 

@@ -9,9 +9,8 @@ import (
 	"time"
 
 	tg "github.com/go-telegram-bot-api/telegram-bot-api"
+	"gopkg.in/mgo.v2/bson"
 )
-
-var News []*NewsItem
 
 func reterr(err error) error {
 
@@ -44,7 +43,35 @@ func ParseNews(input string) (string, error) {
 
 }
 
+func ParseEvents(input string) (string, error) {
+
+	parsed := strings.Split(input, " $ ")
+	if len(parsed) != 6 {
+		return "", errors.New("Parsing error ! ")
+	}
+	var item EventItem
+
+	item.Title = parsed[0]
+	item.Desc = parsed[1]
+	item.Link = parsed[2]
+	item.Date = parsed[3]
+	item.Time = parsed[4]
+	item.Location = parsed[5]
+
+	if DBstatus {
+		InsertEvents(item)
+	} else {
+		return "", errors.New("Database connection is busted -.- ")
+	}
+
+	out := "Title = " + parsed[0] + "Desc = " + parsed[1] + "Link = " + parsed[2] + "Date = " + parsed[3] + "Time = " + parsed[4] + "Location = " + parsed[5]
+	return out, nil
+
+}
+
 func Bot(Con Config) {
+
+	register := false
 
 	defer func() {
 		rec := recover()
@@ -90,29 +117,22 @@ func Bot(Con Config) {
 
 		// Extract the command from the Message.
 		switch update.Message.Command() {
+		//user commands
 		case "help":
 			msg.Text = "type /addnews or cry."
-		case "addnews":
-			args := update.Message.CommandArguments()
-			if args == "" {
-				msg.Text = "Yo ! give me some tasty arguments "
-			} else {
 
-				rawNew, err := ParseNews(args)
-				if err != nil {
-					msg.Text = err.Error()
-				} else {
-					msg.Text = "okay! " + rawNew + " added to list"
-
-				}
-			}
 		case "myid":
 			uid := update.Message.From.ID
 			suid := fmt.Sprintf("%v", uid)
 			msg.Text = suid + " this library is stupid "
-		case "fuckmeup":
+		case "chatid":
+			uid := update.Message.Chat.ID
+			suid := fmt.Sprintf("%v", uid)
+			msg.Text = suid + " this library is stupid "
+
+		case "getnews":
 			if DBstatus {
-				News = GetNews()
+				News := GetNews()
 
 				jsondata, err := json.Marshal(News)
 				if err != nil {
@@ -122,6 +142,98 @@ func Bot(Con Config) {
 				}
 			} else {
 				msg.Text = "Database connection is busted -.-"
+			}
+		case "getevents":
+			if DBstatus {
+				Events := GetEvents()
+
+				jsondata, err := json.Marshal(Events)
+				if err != nil {
+					msg.Text = err.Error()
+				} else {
+					msg.Text = string(jsondata)
+				}
+			} else {
+				msg.Text = "Database connection is busted -.-"
+			}
+
+		//admin commands
+		case "register":
+			if register && update.Message.Chat.ID == Con.AdminChat {
+				tmp := GetAdmin(bson.M{"id": update.Message.From.ID})
+				if tmp.ID == update.Message.From.ID {
+					msg.Text = "hey i know you already !"
+				} else {
+					var new Admin
+					new.ID = update.Message.From.ID
+					AddAdmin(new)
+					msg.Text = "Cool Cool"
+				}
+			} else {
+				msg.Text = "Register is closed for now"
+			}
+		case "killme":
+			tmp := GetAdmin(bson.M{"id": update.Message.From.ID})
+			if tmp.ID == update.Message.From.ID {
+				DelAdmin(tmp)
+				msg.Text = "Done. I will remember you..."
+			} else {
+				msg.Text = "Who the fuck are you ?"
+			}
+
+		case "addnews":
+			args := update.Message.CommandArguments()
+			if args == "" {
+				msg.Text = "Yo ! give me some tasty arguments "
+			} else {
+				tmp := GetAdmin(bson.M{"id": update.Message.From.ID})
+				if tmp.ID == update.Message.From.ID {
+					rawNew, err := ParseNews(args)
+					if err != nil {
+						msg.Text = err.Error()
+					} else {
+						msg.Text = "okay! " + rawNew + " added to list"
+					}
+				} else {
+					fmt.Println(tmp.ID)
+					msg.Text = "Sorry mate you are not cool enough"
+				}
+			}
+		case "addevents":
+			args := update.Message.CommandArguments()
+			if args == "" {
+				msg.Text = "Yo ! give me some tasty arguments "
+			} else {
+				tmp := GetAdmin(bson.M{"id": update.Message.From.ID})
+				if tmp.ID == update.Message.From.ID {
+					rawEvent, err := ParseEvents(args)
+					if err != nil {
+						msg.Text = err.Error()
+					} else {
+						msg.Text = "okay! " + rawEvent + " added to list"
+
+					}
+
+				} else {
+					fmt.Println(tmp.ID)
+					msg.Text = "Sorry mate you are not cool enough"
+				}
+
+			}
+		//jvol commands
+		case "openregister":
+			if update.Message.From.ID == Con.MasterID {
+				msg.Text = "You can now add more admins"
+				register = true
+			} else {
+				msg.Text = "Sorry mate you are not cool enough"
+			}
+		case "closeregister":
+			if update.Message.From.ID == Con.MasterID {
+				msg.Text = "Register is closed now"
+				register = false
+			} else {
+				msg.Text = "Sorry mate you are not cool enough"
 			}
 
 		default:

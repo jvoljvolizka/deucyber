@@ -9,11 +9,24 @@ type NewsItem struct {
 	Time  int64  `json:"Time"`
 }
 
-type Config struct {
-	Botkey   string `json:"Botkey"`
-	MasterID string `json:"MasterID"`
-	DBtype   string `json:"DBtype"`
-	DBname   string `json:"DBname"`
+type Admin struct {
+	ID int `json:"ID"`
+}
 
+type Config struct {
+	Botkey     string `json:"Botkey"`
+	MasterID   int    `json:"MasterID"`
+	AdminChat  int64  `json:"AdminChat"`
+	DBtype     string `json:"DBtype"`
+	DBname     string `json:"DBname"`
 	Connection string `json:"Connection"`
+}
+
+type EventItem struct {
+	Title    string `json:"Title"`
+	Desc     string `json:"Desc"`
+	Link     string `json:"Link"`
+	Date     string `json:"Date"`
+	Time     string `json:"Time"`
+	Location string `json:"Location"`
 }
