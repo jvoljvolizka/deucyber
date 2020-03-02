@@ -14,7 +14,6 @@ import (
 )
 
 var Config deucyber.Config
-var newsList []string
 
 func reterr(err error) error {
 

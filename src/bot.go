@@ -220,7 +220,16 @@ func Bot(Con Config) {
 				}
 
 			}
-		//jvol commands
+			//jvol commands
+		case "getconfig":
+			if update.Message.From.ID == Con.MasterID {
+				jsondata, _ := json.Marshal(Con)
+				msg.Text = string(jsondata)
+
+			} else {
+				msg.Text = "Sorry mate you are not cool enough"
+			}
+
 		case "openregister":
 			if update.Message.From.ID == Con.MasterID {
 				msg.Text = "You can now add more admins"
