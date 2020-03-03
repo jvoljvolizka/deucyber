@@ -86,7 +86,7 @@ func main() {
 	}
 
 	///clean this shit please
-
+	deucyber.Conf = Config
 	deucyber.GetConf(Config)
 
 	fmt.Println(Config.Botkey)
@@ -95,7 +95,7 @@ func main() {
 
 	go deucyber.DBcheck()
 	go deucyber.Bot(Config)
-
+	go deucyber.GitInit()
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", index)
 	router.HandleFunc("/news", news)

@@ -4,5 +4,8 @@
     "DBtype" : "DATABASE-TYPE-(mongodb/dynamodb <- not implemented)",
     "DBname" : "DATABASE-NAME",
     "Connection" : "(connection info)",
-    "AdminChat" : "adminchatid -int-"
+    "AdminChat" : "adminchatid -int-",
+    "GithubUsername" : "GithubUsername",
+    "GithubRepo" : "GithubRepoName" , 
+    "GithubApiKey" : "GithubPersonelAccessToken"
 }

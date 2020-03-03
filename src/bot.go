@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -220,6 +221,29 @@ func Bot(Con Config) {
 				}
 
 			}
+		case "getpr":
+			tmp := GetAdmin(bson.M{"id": update.Message.From.ID})
+			if tmp.ID == update.Message.From.ID {
+				prs, err := GetPrs()
+				if err != nil {
+					msg.Text = err.Error()
+				} else {
+					if len(prs) != 0 {
+						resp := ""
+						for _, pr := range prs {
+							resp = resp + pr.GetHTMLURL() + fmt.Sprintf(" /merge%v", pr.GetNumber()) + "\n"
+						}
+						msg.Text = resp
+					} else {
+						msg.Text = "No new pull requests"
+					}
+				}
+
+			} else {
+				fmt.Println(tmp.ID)
+				msg.Text = "Sorry mate you are not cool enough"
+			}
+
 			//jvol commands
 		case "getconfig":
 			if update.Message.From.ID == Con.MasterID {
@@ -246,7 +270,28 @@ func Bot(Con Config) {
 			}
 
 		default:
-			msg.Text = "wat ?"
+			if update.Message.Command()[:5] == "merge" {
+				tmp := GetAdmin(bson.M{"id": update.Message.From.ID})
+				if tmp.ID == update.Message.From.ID {
+					num, err := strconv.Atoi(update.Message.Command()[5:])
+					if err != nil {
+						msg.Text = "parsing error"
+					} else {
+						err = Merge(num)
+						if err != nil {
+							msg.Text = err.Error()
+						} else {
+							msg.Text = "Merge successful"
+						}
+					}
+				} else {
+					fmt.Println(tmp.ID)
+					msg.Text = "Sorry mate you are not cool enough"
+				}
+			} else {
+				msg.Text = "wat ?"
+			}
+
 		}
 
 		_, err := bot.Send(msg)

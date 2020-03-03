@@ -1,6 +1,7 @@
 package deucyber
 
 var DBstatus bool = true
+var Conf Config
 
 type NewsItem struct {
 	Title string `json:"Title"`
@@ -14,12 +15,15 @@ type Admin struct {
 }
 
 type Config struct {
-	Botkey     string `json:"Botkey"`
-	MasterID   int    `json:"MasterID"`
-	AdminChat  int64  `json:"AdminChat"`
-	DBtype     string `json:"DBtype"`
-	DBname     string `json:"DBname"`
-	Connection string `json:"Connection"`
+	Botkey         string `json:"Botkey"`
+	MasterID       int    `json:"MasterID"`
+	AdminChat      int64  `json:"AdminChat"`
+	DBtype         string `json:"DBtype"`
+	DBname         string `json:"DBname"`
+	Connection     string `json:"Connection"`
+	GithubUsername string `json:"GithubUsername"`
+	GithubRepo     string `json:"GithubRepo"`
+	GithubApiKey   string `json:"GithubApiKey"`
 }
 
 type EventItem struct {
