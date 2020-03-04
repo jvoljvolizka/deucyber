@@ -94,8 +94,9 @@ func main() {
 	fmt.Println(Config.MasterID)
 
 	go deucyber.DBcheck()
-	go deucyber.Bot(Config)
 	go deucyber.GitInit()
+	go deucyber.Bot(Config)
+
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", index)
 	router.HandleFunc("/news", news)

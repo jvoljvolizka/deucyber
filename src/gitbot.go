@@ -9,6 +9,7 @@ import (
 
 //5568fbba42d2524cb5d7e613fbe04171005b1875
 var client *github.Client
+var CurPrs []*github.PullRequest
 
 func GitInit() {
 	ctx := context.Background()
@@ -25,7 +26,18 @@ func GetPrs() ([]*github.PullRequest, error) {
 	if err != nil {
 		return nil, err
 	}
+	CurPrs = Prs
 	return Prs, nil
+}
+
+func UpdatePrs() error {
+	Prs, _, err := client.PullRequests.List(context.Background(), Conf.GithubUsername, Conf.GithubRepo, nil)
+
+	if err != nil {
+		return err
+	}
+	CurPrs = Prs
+	return nil
 }
 
 func Merge(prNum int) error {
@@ -33,5 +45,6 @@ func Merge(prNum int) error {
 	if err != nil {
 		return err
 	}
+	go UpdatePrs()
 	return nil
 }

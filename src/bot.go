@@ -10,6 +10,7 @@ import (
 	"time"
 
 	tg "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/google/go-github/github"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -18,6 +19,18 @@ func reterr(err error) error {
 	fmt.Print(err.Error())
 	return nil
 
+}
+
+func Equal(a, b []*github.PullRequest) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func ParseNews(input string) (string, error) {
@@ -104,6 +117,17 @@ func Bot(Con Config) {
 	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {
+
+		// Create a new MessageConfig. We don't have text yet,
+		// so we should leave it empty.
+		msg := tg.NewMessage(update.Message.Chat.ID, "")
+
+		/*	oldcur := CurPrs
+			_ = UpdatePrs()
+			if !Equal(oldcur, CurPrs) {
+				msg.Text = "Yo ! we got a new Pr : " + CurPrs[len(CurPrs)-1].GetHTMLURL()
+			}
+		*/
 		if update.Message == nil { // ignore any non-Message updates
 			continue
 		}
@@ -111,10 +135,6 @@ func Bot(Con Config) {
 		if !update.Message.IsCommand() { // ignore any non-command Messages
 			continue
 		}
-
-		// Create a new MessageConfig. We don't have text yet,
-		// so we should leave it empty.
-		msg := tg.NewMessage(update.Message.Chat.ID, "")
 
 		// Extract the command from the Message.
 		switch update.Message.Command() {
