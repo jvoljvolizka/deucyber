@@ -288,25 +288,35 @@ func Bot(Con Config) {
 			} else {
 				msg.Text = "Sorry mate you are not cool enough"
 			}
-
+		case "say":
+			if update.Message.From.ID == Con.MasterID {
+				ms := tg.NewMessage(Conf.AdminChat, "")
+				ms.Text = update.Message.CommandArguments()
+				bot.Send(ms)
+				msg.Text = "okay"
+			} else {
+				msg.Text = "Sorry mate you are not cool enough"
+			}
 		default:
-			if update.Message.Command()[:5] == "merge" {
-				tmp := GetAdmin(bson.M{"id": update.Message.From.ID})
-				if tmp.ID == update.Message.From.ID {
-					num, err := strconv.Atoi(update.Message.Command()[5:])
-					if err != nil {
-						msg.Text = "parsing error"
-					} else {
-						err = Merge(num)
+			if len(update.Message.Command()) > 5 {
+				if update.Message.Command()[:5] == "merge" {
+					tmp := GetAdmin(bson.M{"id": update.Message.From.ID})
+					if tmp.ID == update.Message.From.ID {
+						num, err := strconv.Atoi(update.Message.Command()[5:])
 						if err != nil {
-							msg.Text = err.Error()
+							msg.Text = "parsing error"
 						} else {
-							msg.Text = "Merge successful"
+							err = Merge(num)
+							if err != nil {
+								msg.Text = err.Error()
+							} else {
+								msg.Text = "Merge successful"
+							}
 						}
+					} else {
+						fmt.Println(tmp.ID)
+						msg.Text = "Sorry mate you are not cool enough"
 					}
-				} else {
-					fmt.Println(tmp.ID)
-					msg.Text = "Sorry mate you are not cool enough"
 				}
 			} else {
 				msg.Text = "wat ?"
