@@ -7,5 +7,6 @@
     "AdminChat" : "adminchatid -int-",
     "GithubUsername" : "GithubUsername",
     "GithubRepo" : "GithubRepoName" , 
-    "GithubApiKey" : "GithubPersonelAccessToken"
+    "GithubApiKey" : "GithubPersonelAccessToken",
+    "SplitString" : ";;"
 }

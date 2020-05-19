@@ -4,10 +4,10 @@ var DBstatus bool = true
 var Conf Config
 
 type NewsItem struct {
-	Title string `json:"Title"`
-	Desc  string `json:"Desc"`
-	Link  string `json:"Link"`
-	Time  int64  `json:"Time"`
+	Title       string `json:"Title"`
+	Desc        string `json:"Desc"`
+	Link        string `json:"Link"`
+	PublishTime int64  `json:"PublishTime"`
 }
 
 type Admin struct {
@@ -24,13 +24,15 @@ type Config struct {
 	GithubUsername string `json:"GithubUsername"`
 	GithubRepo     string `json:"GithubRepo"`
 	GithubApiKey   string `json:"GithubApiKey"`
+	SplitString    string `json:"SplitString"`
 }
 
 type EventItem struct {
-	Title    string `json:"Title"`
-	Desc     string `json:"Desc"`
-	Link     string `json:"Link"`
-	Date     string `json:"Date"`
-	Time     string `json:"Time"`
-	Location string `json:"Location"`
+	Title       string `json:"Title"`
+	Desc        string `json:"Desc"`
+	Link        string `json:"Link"`
+	Date        string `json:"Date"`
+	Time        string `json:"Time"`
+	Location    string `json:"Location"`
+	PublishTime int64  `json:"PublishTime"`
 }

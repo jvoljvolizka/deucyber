@@ -35,7 +35,7 @@ func Equal(a, b []*github.PullRequest) bool {
 
 func ParseNews(input string) (string, error) {
 
-	parsed := strings.Split(input, " $ ")
+	parsed := strings.Split(input, Conf.SplitString)
 	if len(parsed) != 3 {
 		return "", errors.New("Parsing error ! ")
 	}
@@ -44,7 +44,7 @@ func ParseNews(input string) (string, error) {
 	item.Title = parsed[0]
 	item.Desc = parsed[1]
 	item.Link = parsed[2]
-	item.Time = time.Now().UnixNano()
+	item.PublishTime = time.Now().UnixNano()
 
 	if DBstatus {
 		InsertNews(item)
@@ -59,7 +59,7 @@ func ParseNews(input string) (string, error) {
 
 func ParseEvents(input string) (string, error) {
 
-	parsed := strings.Split(input, " $ ")
+	parsed := strings.Split(input, Conf.SplitString)
 	if len(parsed) != 6 {
 		return "", errors.New("Parsing error ! ")
 	}
@@ -71,6 +71,7 @@ func ParseEvents(input string) (string, error) {
 	item.Date = parsed[3]
 	item.Time = parsed[4]
 	item.Location = parsed[5]
+	item.PublishTime = time.Now().UnixNano()
 
 	if DBstatus {
 		InsertEvents(item)
@@ -317,6 +318,8 @@ func Bot(Con Config) {
 						fmt.Println(tmp.ID)
 						msg.Text = "Sorry mate you are not cool enough"
 					}
+				} else {
+					msg.Text = "wat ?"
 				}
 			} else {
 				msg.Text = "wat ?"
