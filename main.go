@@ -1,7 +1,6 @@
-package main
+package deucyber
 
 import (
-	"deucyber"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	deucyber "github.com/jvoljvolizka/deucyber/src"
 )
 
 var Config deucyber.Config
