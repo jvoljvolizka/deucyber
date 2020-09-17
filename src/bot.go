@@ -318,12 +318,12 @@ func Bot(Con Config) {
 						fmt.Println(tmp.ID)
 						msg.Text = "Sorry mate you are not cool enough"
 					}
-				} else {
+				} /* else {
 					msg.Text = "wat ?"
-				}
-			} else {
+				}*/
+			} /*else {
 				msg.Text = "wat ?"
-			}
+			}*/
 
 		}
 
